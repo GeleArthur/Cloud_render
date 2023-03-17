@@ -7,6 +7,7 @@ use bevy::reflect::TypeUuid;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 use bevy::window::WindowMode;
 use bevy::{pbr::PbrPlugin, prelude::*};
+use bevy_editor_pls::default_windows::cameras::EditorCamera;
 use bevy_editor_pls::prelude::*;
 
 use camera_orbit::{CameraControllerPlugin, CameraController};
@@ -30,6 +31,7 @@ fn main() {
         .add_plugin(MaterialPlugin::<RayMarchingMaterial>::default())
         .add_plugin(CameraControllerPlugin)
         .add_startup_system(startup)
+        .add_system(quad_follow_camera)
         .add_plugin(EditorPlugin)
         .run();
 }
@@ -72,8 +74,23 @@ fn startup(
                 .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
             ..default()
         },
+        QuadLabel,
         NotShadowCaster,
     ));
+}
+
+#[derive(Component)]
+struct QuadLabel;
+
+fn quad_follow_camera(
+    mut quad: Query<&mut Transform, With<QuadLabel>>,
+    camera: Query<&Transform, (With<Camera3d>, Without<EditorCamera>, Without<QuadLabel>)>
+){
+    let mut quad = quad.single_mut();
+    let camera = camera.single();
+
+    quad.rotation = camera.rotation;
+    quad.translation = camera.translation + camera.forward();
 }
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]

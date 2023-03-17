@@ -1,0 +1,15 @@
+[package]
+name = "cloud_render"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[dependencies]
+bevy = { version = "0.10.0", features = ["dynamic_linking"] }
+bevy_editor_pls = "0.3"
+bevy-rust-gpu = { git = "https://github.com/Bevy-Rust-GPU/bevy-rust-gpu", tag = "v0.4.0" }

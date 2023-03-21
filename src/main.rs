@@ -1,16 +1,15 @@
 mod camera_orbit;
 
-
 use bevy::core_pipeline::prepass::{DepthPrepass, NormalPrepass};
 use bevy::pbr::NotShadowCaster;
 use bevy::reflect::TypeUuid;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
-use bevy::window::WindowMode;
+use bevy::window::{WindowMode, WindowResized};
 use bevy::{pbr::PbrPlugin, prelude::*};
 use bevy_editor_pls::default_windows::cameras::EditorCamera;
 use bevy_editor_pls::prelude::*;
 
-use camera_orbit::{CameraControllerPlugin, CameraController};
+use camera_orbit::{CameraController, CameraControllerPlugin};
 
 fn main() {
     App::new()
@@ -25,6 +24,10 @@ fn main() {
                         mode: WindowMode::Windowed,
                         ..Default::default()
                     }),
+                    ..Default::default()
+                })
+                .set(AssetPlugin {
+                    watch_for_changes: true,
                     ..Default::default()
                 }),
         )
@@ -41,15 +44,13 @@ fn startup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut ray_materials: ResMut<Assets<RayMarchingMaterial>>,
     mut std_materials: ResMut<Assets<StandardMaterial>>,
-
 ) {
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-
             ..default()
         },
-        CameraController{
+        CameraController {
             orbit_mode: true,
             ..Default::default()
         },
@@ -57,14 +58,12 @@ fn startup(
         NormalPrepass,
     ));
 
-    commands.spawn(
-        PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: std_materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-            transform: Transform::from_xyz(-1.0, 0.5, 0.0),
-            ..default()
-        }
-    );
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: std_materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+        transform: Transform::from_xyz(0.0, 0.0, 0.0),
+        ..default()
+    });
 
     commands.spawn((
         MaterialMeshBundle {
@@ -84,8 +83,8 @@ struct QuadLabel;
 
 fn quad_follow_camera(
     mut quad: Query<&mut Transform, With<QuadLabel>>,
-    camera: Query<&Transform, (With<Camera3d>, Without<EditorCamera>, Without<QuadLabel>)>
-){
+    camera: Query<&Transform, (With<Camera3d>, Without<EditorCamera>, Without<QuadLabel>)>,
+) {
     let mut quad = quad.single_mut();
     let camera = camera.single();
 

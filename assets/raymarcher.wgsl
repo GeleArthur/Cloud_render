@@ -25,9 +25,8 @@ fn fragment(
 
     //let uv = coords_to_viewport_uv(frag_coord.xy, view.viewport);
     //let uv = (frag_coord.xy - 0.5 * view.viewport.xy) / view.viewport.y;
-//    let depth = prepass_depth(frag_coord, sample_index);
-//
-//    let color = step(depth, 0.02);
+    //let depth = prepass_depth(frag_coord, sample_index);
+    //let color = step(depth, 0.02);
 
     let camera = vec3(0.0,1.0,0.0);
     let ray = normalize(vec3(uv.x, uv.y, 1.0));
@@ -44,12 +43,6 @@ fn fragment(
 
     //color = step(color, 8.0);
     //color /= 10.0;
-
-//    let background_color = vec3(0.0,1.0,1.0);
-//    let sigma_a = 0.1; // absorption coefficient
-//    let distance = 10.0;
-//    let T = exp(-distance * sigma_a);
-//    let color = T * background_color;
 
     return vec4(color, 1.0);
 }
@@ -77,9 +70,14 @@ fn GetDist(position: vec3<f32>) -> f32 {
     let cricleRadius = 1.0;
     let sphereDistance = length(position-criclePosition) - cricleRadius;
 
+    let criclePosition2 = vec3(2.0,1.0,6.0);
+    let cricleRadius2 = 1.0;
+    let sphereDistance2 = length(position-criclePosition2) - cricleRadius2;
+
     let planeDist = position.y;
 
-    let dist = min(planeDist, sphereDistance);
+    var dist = min(planeDist, sphereDistance);
+    dist = min(dist, sphereDistance2);
 
     return dist;
 }

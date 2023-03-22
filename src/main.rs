@@ -1,10 +1,11 @@
 mod camera_orbit;
 
 use bevy::core_pipeline::prepass::{DepthPrepass, NormalPrepass};
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::pbr::NotShadowCaster;
 use bevy::reflect::TypeUuid;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
-use bevy::window::{WindowMode, WindowResized};
+use bevy::window::{PresentMode, WindowMode, WindowResized};
 use bevy::{pbr::PbrPlugin, prelude::*};
 use bevy_editor_pls::default_windows::cameras::EditorCamera;
 use bevy_editor_pls::prelude::*;
@@ -22,6 +23,7 @@ fn main() {
                     primary_window: Some(Window {
                         position: WindowPosition::Centered(MonitorSelection::Index(0)),
                         mode: WindowMode::Windowed,
+                        present_mode: PresentMode::AutoVsync,
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -36,6 +38,8 @@ fn main() {
         .add_startup_system(startup)
         .add_system(quad_follow_camera)
         .add_plugin(EditorPlugin)
+        //.add_plugin(LogDiagnosticsPlugin::default())
+        //.add_plugin(FrameTimeDiagnosticsPlugin::default())
         .run();
 }
 

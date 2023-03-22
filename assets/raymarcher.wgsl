@@ -2,6 +2,7 @@
 #import bevy_pbr::mesh_view_bindings
 #import bevy_pbr::prepass_utils
 #import bevy_pbr::utils
+//#import bevy_render::globals
 
 struct RayMarchSettings {
     color: vec4<f32>
@@ -20,6 +21,7 @@ fn fragment(
     var uv = (frag_coord.xy) - 0.5 * view.viewport.zw;
 
     uv /= view.viewport.w;
+    uv.y = -uv.y;
 
     //let uv = coords_to_viewport_uv(frag_coord.xy, view.viewport);
     //let uv = (frag_coord.xy - 0.5 * view.viewport.xy) / view.viewport.y;
@@ -30,8 +32,18 @@ fn fragment(
     let camera = vec3(0.0,1.0,0.0);
     let ray = normalize(vec3(uv.x, uv.y, 1.0));
 
-    var color = RayMarch(camera, ray);
-    color /= 10.0;
+    var distance = RayMarch(camera, ray);
+
+    let pointOnScene = camera + ray * distance;
+
+    let diffuseLight = GetLight(pointOnScene);
+
+    let color = vec3(diffuseLight);
+
+    //let color = GetNormal(pointOnScene);
+
+    //color = step(color, 8.0);
+    //color /= 10.0;
 
 //    let background_color = vec3(0.0,1.0,1.0);
 //    let sigma_a = 0.1; // absorption coefficient
@@ -39,13 +51,13 @@ fn fragment(
 //    let T = exp(-distance * sigma_a);
 //    let color = T * background_color;
 
-    return vec4(color, color, color, 1.0);
+    return vec4(color, 1.0);
 }
 
 fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{
-    let MAX_STEPS = 10;
+    let MAX_STEPS = 100;
     let MAX_DIST = 100.0;
-    let SURF_DIST = 0.1;
+    let SURF_DIST = 0.01;
     var distanceMarged = 0.0;
 
     for (var i:i32 = 0; i< MAX_STEPS; i++){
@@ -72,3 +84,34 @@ fn GetDist(position: vec3<f32>) -> f32 {
     return dist;
 }
 
+fn GetLight(pointOnScene:vec3<f32>) -> f32 {
+    let lightOffest = vec2<f32>(sin(f32(globals.frame_count)/30.0)*2.0, cos(f32(globals.frame_count)/30.0)*2.);
+
+
+    let lightPos = vec3(0.0 + lightOffest.x, 5.0, 6.0 + lightOffest.y);
+    let lightVector = normalize(lightPos - pointOnScene);
+
+    let normalOfSurface = GetNormal(pointOnScene);
+
+    var diffuse = clamp(dot(normalOfSurface, lightVector), 0.0, 1.0);
+
+    let shadowDist = RayMarch(pointOnScene + normalOfSurface * 0.02, lightVector);
+    if(shadowDist < length(lightPos - pointOnScene)) {
+        diffuse *= .1;
+    }
+
+    return diffuse;
+}
+
+fn GetNormal(pointOnScene: vec3<f32>) -> vec3<f32>{
+    let d = GetDist(pointOnScene);
+    let offset = vec2<f32>(0.01, 0.0);
+
+    let n = d - vec3(
+        GetDist(pointOnScene - offset.xyy),
+        GetDist(pointOnScene - offset.yxy),
+        GetDist(pointOnScene - offset.yyx)
+    );
+
+    return normalize(n);
+}

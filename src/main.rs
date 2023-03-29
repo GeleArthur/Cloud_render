@@ -36,7 +36,7 @@ fn main() {
         .add_plugin(MaterialPlugin::<RayMarchingMaterial>::default())
         .add_plugin(CameraControllerPlugin)
         .add_startup_system(startup)
-        // .add_system(quad_follow_camera)
+        .add_system(quad_follow_camera)
         .add_plugin(EditorPlugin)
         //.add_plugin(LogDiagnosticsPlugin::default())
         //.add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -69,24 +69,20 @@ fn startup(
         ..default()
     });
 
-    commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: ray_materials.add(RayMarchingMaterial {}),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-        ..default()
-    });
-
-    // commands.spawn((
-    //     MaterialMeshBundle {
-    //         mesh: meshes.add(shape::Quad::new(Vec2::new(25.0, 25.0)).into()),
-    //         material: ray_materials.add(RayMarchingMaterial {}),
-    //         transform: Transform::from_xyz(-0.75, 1.25, 3.0)
-    //             .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
-    //         ..default()
-    //     },
-    //     QuadLabel,
-    //     NotShadowCaster,
-    // ));
+    commands.spawn((
+        MaterialMeshBundle {
+            mesh: meshes.add(shape::Quad::new(Vec2::new(1.0, 1.0)).into()),
+            material: ray_materials.add(RayMarchingMaterial {
+                position: Vec3::new(0.0, 0.0, 0.0),
+                radius: 1.0,
+            }),
+            transform: Transform::from_xyz(-0.75, 1.25, 3.0)
+                .looking_at(Vec3::new(2.0, -2.5, -5.0), Vec3::Y),
+            ..default()
+        },
+        QuadLabel,
+        NotShadowCaster,
+    ));
 }
 
 #[derive(Component)]
@@ -105,7 +101,12 @@ fn quad_follow_camera(
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]
 #[uuid = "83902611-1612-4997-834d-e826f686c4f3"]
-struct RayMarchingMaterial {}
+struct RayMarchingMaterial {
+    #[uniform(0)]
+    position: Vec3,
+    #[uniform(1)]
+    radius: f32,
+}
 
 impl Material for RayMarchingMaterial {
     fn fragment_shader() -> ShaderRef {

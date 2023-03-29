@@ -4,8 +4,15 @@
 #import bevy_pbr::utils
 //#import bevy_render::globals
 
+#import bevy_core_pipeline::fullscreen_vertex_shader
+
+const MAX_STEPS = 100;
+const MAX_DIST = 100.0;
+const SURF_DIST = 0.01;
+
 struct RayMarchSettings {
-    color: vec4<f32>
+    position: vec3<f32>,
+    radius: f32,
 }
 
 @group(1) @binding(0)
@@ -48,9 +55,7 @@ fn fragment(
 }
 
 fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{
-    let MAX_STEPS = 100;
-    let MAX_DIST = 100.0;
-    let SURF_DIST = 0.01;
+
     var distanceMarged = 0.0;
 
     for (var i:i32 = 0; i< MAX_STEPS; i++){

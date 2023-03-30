@@ -53,6 +53,11 @@ fn startup(
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            projection: Projection::Perspective(PerspectiveProjection {
+                near: 0.1,
+                far: 0.0,
+                ..default()
+            }),
             ..default()
         },
         CameraController {
@@ -96,8 +101,8 @@ fn quad_follow_camera(
     let mut quad = quad.single_mut();
     let camera = camera.single();
 
-    quad.rotation = camera.rotation;
-    quad.translation = camera.translation + camera.forward();
+    // quad.rotation = camera.rotation;
+    // quad.translation = camera.translation + camera.forward();
 }
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]

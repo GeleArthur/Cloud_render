@@ -24,15 +24,8 @@ fn fragment(
     @builtin(sample_index) sample_index: u32,
     #import bevy_pbr::mesh_vertex_output
 ) -> @location(0) vec4<f32> {
-
-    var uv = (frag_coord.xy) - 0.5 * view.viewport.zw;
-
-    uv /= view.viewport.w;
-    uv.y = -uv.y;
-
-    //let uv = coords_to_viewport_uv(frag_coord.xy, view.viewport);
-    //let uv = (frag_coord.xy - 0.5 * view.viewport.xy) / view.viewport.y;
-    //let depth = prepass_depth(frag_coord, sample_index);
+    let uv = (frag_coord.xy - 0.5 * view.viewport.xy) / view.viewport.y;
+    let depth = prepass_depth(frag_coord, sample_index);
     //let color = step(depth, 0.02);
 
 //    let x = ;
@@ -43,24 +36,26 @@ fn fragment(
 
     var distance = RayMarch(camera, ray);
 
+//    if(distance < depth) {
+//        discard;
+//    }
+
     let pointOnScene = camera + ray * distance;
 
     let diffuseLight = GetLight(pointOnScene);
 
-    if(diffuseLight < 0.1) {
-        discard;
-    }
+    var color = vec3(distance);
 
-    let color = vec3(diffuseLight);
 
-    //let color = GetNormal(pointOnScene);
+
+//    let color = GetNormal(pointOnScene);
 
     //color = step(color, 8.0);
-    //color /= 10.0;
+    color /= 10.0;
 
 
 
-    return vec4(color, 1.0);
+    return vec4(vec3(depth), 1.0);
 }
 
 fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{
@@ -93,7 +88,6 @@ fn GetDist(position: vec3<f32>) -> f32 {
 
 fn GetLight(pointOnScene:vec3<f32>) -> f32 {
     let lightOffest = vec2<f32>(sin(f32(globals.frame_count)/30.0)*2.0, cos(f32(globals.frame_count)/30.0)*2.);
-
 
     let lightPos = vec3(0.0 + lightOffest.x, 5.0, 6.0 + lightOffest.y);
     let lightVector = normalize(lightPos - pointOnScene);

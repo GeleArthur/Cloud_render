@@ -4,6 +4,7 @@ use bevy::core_pipeline::prepass::{DepthPrepass, NormalPrepass};
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::pbr::NotShadowCaster;
 use bevy::reflect::TypeUuid;
+use bevy::render::extract_component::ExtractComponentPlugin;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 use bevy::window::{PresentMode, WindowMode};
 use bevy::{pbr::PbrPlugin, prelude::*};

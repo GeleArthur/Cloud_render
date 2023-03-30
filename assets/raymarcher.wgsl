@@ -35,8 +35,11 @@ fn fragment(
     //let depth = prepass_depth(frag_coord, sample_index);
     //let color = step(depth, 0.02);
 
-    let camera = vec3(0.0,1.0,0.0);
-    let ray = normalize(vec3(uv.x, uv.y, 1.0));
+//    let x = ;
+
+    let camera = vec3(view.world_position.x, view.world_position.y, view.world_position.z);
+    let ray = normalize(world_position.xyz - camera);
+    //let ray = normalize(vec3(uv.x, uv.y, 1.0));
 
     var distance = RayMarch(camera, ray);
 
@@ -44,12 +47,18 @@ fn fragment(
 
     let diffuseLight = GetLight(pointOnScene);
 
+    if(diffuseLight < 0.1) {
+        discard;
+    }
+
     let color = vec3(diffuseLight);
 
     //let color = GetNormal(pointOnScene);
 
     //color = step(color, 8.0);
     //color /= 10.0;
+
+
 
     return vec4(color, 1.0);
 }
@@ -71,20 +80,15 @@ fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{
 }
 
 fn GetDist(position: vec3<f32>) -> f32 {
-    let criclePosition = vec3(0.0,1.0,6.0);
+    let criclePosition = vec3(0.0,0.0,0.0);
     let cricleRadius = 1.0;
     let sphereDistance = length(position-criclePosition) - cricleRadius;
-
-    let criclePosition2 = vec3(2.0,1.0,6.0);
-    let cricleRadius2 = 1.0;
-    let sphereDistance2 = length(position-criclePosition2) - cricleRadius2;
 
     let planeDist = position.y;
 
     var dist = min(planeDist, sphereDistance);
-    dist = min(dist, sphereDistance2);
 
-    return dist;
+    return sphereDistance;
 }
 
 fn GetLight(pointOnScene:vec3<f32>) -> f32 {

@@ -30,13 +30,15 @@ fn fragment(
 
 //    let x = ;
 
+
+
     let camera = vec3(view.world_position.x, view.world_position.y, view.world_position.z);
     let ray = normalize(world_position.xyz - camera);
     //let ray = normalize(vec3(uv.x, uv.y, 1.0));
 
     var distance = RayMarch(camera, ray);
 
-//    if(distance < depth) {
+//    if(distance > depth*1000.) {
 //        discard;
 //    }
 
@@ -44,7 +46,7 @@ fn fragment(
 
     let diffuseLight = GetLight(pointOnScene);
 
-    var color = vec3(distance);
+    var color = vec3(diffuseLight);
 
 
 
@@ -54,8 +56,8 @@ fn fragment(
     color /= 10.0;
 
 
-
-    return vec4(vec3(depth), 1.0);
+    return vec4(vec3(color),1.0);
+//    return vec4(vec3(distance/1000.), 1.0);
 }
 
 fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{

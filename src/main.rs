@@ -86,7 +86,7 @@ fn startup(
         },
         CameraController {
             orbit_mode: true,
-            orbit_focus: Vec3::new(0.0, 0.0, 0.0),
+            orbit_focus: Vec3::new(0.0, 1.0, 0.0),
             ..Default::default()
         },
         DepthPrepass,

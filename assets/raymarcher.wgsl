@@ -75,14 +75,24 @@ fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{
 fn GetDist(position: vec3<f32>) -> f32 {
     var dist = MAX_DIST;
 //    dist = min(dist, sdSphere(position - vec3(5.0,1.0,0.0), 1.0));
-//    dist = min(dist, sdCapsule(position, vec3(0.0, 1.0, 0.0), vec3(0.0, 2.0, 0.0), 0.2));
+    let capsule = sdCapsule(position, vec3(0.0, 1.0, 0.0), vec3(0.0, 5.0, 0.0), 0.5);
     dist = min(dist, position.y);
-//    dist = min(dist, sdTorus(position - vec3(0.0,1.0,0.0), vec2(1.5, 0.5)));
-    var cubeRotation = position - vec3(0.0,1.0,0.0);
-    let rot = cubeRotation.xz * rotate(f32(globals.frame_count)/1000.0);
-    let cuberot2 = vec3(rot.x, cubeRotation.y, rot.y);
+    let torus = min(dist, sdTorus(position - vec3(0.0,1.0,0.0), vec2(1.5, 0.5)));
+//    var cubeRotation = position - vec3(0.0,1.0,0.0);
+    let rot = rotate(f32(globals.frame_count)/100.0);
+//    let cuberot2 = vec3(rot.x, cubeRotation.y, rot.y);
+//
+//    let cube = sdBox(position - vec3(0.0,1.0,0.0), vec3(1.0, 1.0, 1.0));
 
-    dist = min(dist, sdBox(cuberot2, vec3(1.0, 1.0, 1.0)));
+    let sphere1 = sdSphere(position - vec3(-1.0,1.0,0.0), 2.0);
+    let sphere2 = sdSphere(position - vec3(1.0,1.0,0.0), 2.0);
+
+
+
+    var sphereDistance = smin(sphere2, sphere1, sin(f32(globals.frame_count)/100.0+1.0));
+    sphereDistance = smin(capsule, sphereDistance, sin(f32(globals.frame_count)/100.0)+1.0);
+    dist = min(dist, sphereDistance);
+
 
     return dist;
 }
@@ -122,6 +132,11 @@ fn rotate(a:f32) -> mat2x2<f32> {
     let s = sin(a);
     let c = cos(a);
     return mat2x2<f32>(c, -s, s, c);
+}
+
+fn smin(a: f32, b: f32, k: f32) -> f32 {
+    let h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);
+    return mix(b, a, h) - k * h * (1.0 - h);
 }
 
 fn sdCapsule(cameraPoint: vec3<f32>, startAPoint: vec3<f32>, startBPoint:vec3<f32>, radius: f32) -> f32 {

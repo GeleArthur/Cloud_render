@@ -23,7 +23,7 @@ fn main() {
                 })
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        position: WindowPosition::Centered(MonitorSelection::Index(1)),
+                        position: WindowPosition::Centered(MonitorSelection::Index(0)),
                         mode: WindowMode::Windowed,
                         present_mode: PresentMode::AutoVsync,
                         ..Default::default()
@@ -40,8 +40,8 @@ fn main() {
         .add_startup_system(startup)
         .add_system(quad_follow_camera)
         .add_plugin(EditorPlugin)
-        //.add_plugin(LogDiagnosticsPlugin::default())
-        //.add_plugin(FrameTimeDiagnosticsPlugin::default())
+        // .add_plugin(LogDiagnosticsPlugin::default())
+        // .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .run();
 }
 

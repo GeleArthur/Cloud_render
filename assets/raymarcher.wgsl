@@ -75,23 +75,40 @@ fn RayMarch(ro: vec3<f32>, rd: vec3<f32>) -> f32{
 fn GetDist(position: vec3<f32>) -> f32 {
     var dist = MAX_DIST;
 //    dist = min(dist, sdSphere(position - vec3(5.0,1.0,0.0), 1.0));
-    let capsule = sdCapsule(position, vec3(0.0, 1.0, 0.0), vec3(0.0, 5.0, 0.0), 0.5);
+//    let capsule = sdCapsule(position, vec3(0.0, 1.0, 0.0), vec3(0.0, 5.0, 0.0), 0.5);
     dist = min(dist, position.y);
-    let torus = min(dist, sdTorus(position - vec3(0.0,1.0,0.0), vec2(1.5, 0.5)));
+//    let torus = min(dist, sdTorus(position - vec3(0.0,1.0,0.0), vec2(1.5, 0.5)));
 //    var cubeRotation = position - vec3(0.0,1.0,0.0);
-    let rot = rotate(f32(globals.frame_count)/100.0);
+//    let rot = rotate(f32(globals.frame_count)/100.0);
 //    let cuberot2 = vec3(rot.x, cubeRotation.y, rot.y);
 //
 //    let cube = sdBox(position - vec3(0.0,1.0,0.0), vec3(1.0, 1.0, 1.0));
 
-    let sphere1 = sdSphere(position - vec3(-1.0,1.0,0.0), 2.0);
-    let sphere2 = sdSphere(position - vec3(1.0,1.0,0.0), 2.0);
+    var cloudDistance = 100.;
+
+    let sphere1 = sdSphere(position - vec3(-1.0 + smoothSin(100.0),1.0,0.0), 1.0);
+    cloudDistance = smin(cloudDistance, sphere1, 0.9);
+    let sphere2 = sdSphere(position - vec3(1.0 + smoothSin(120.0),1.0,0.0), 1.0);
+    cloudDistance = smin(cloudDistance, sphere2, 0.9);
+    let sphere3 = sdSphere(position - vec3(0.0 + smoothSin(500.0),2.0,0.0), 1.0);
+    cloudDistance = smin(cloudDistance, sphere3, 0.9);
+    let sphere4 = sdSphere(position - vec3(0.3 + smoothSin(300.0),1.0,1.0), 1.0);
+    cloudDistance = smin(cloudDistance, sphere4, 0.9);
+    let sphere5 = sdSphere(position - vec3(2.0 + smoothSin(50.0),1.0,1.0), 1.0);
+    cloudDistance = smin(cloudDistance, sphere5, 0.9);
+    let sphere6 = sdSphere(position - vec3(1.5 + smoothSin(100.0),2.0,0.0), 1.0);
+    cloudDistance = smin(cloudDistance, sphere6, 0.9);
+
+//    let sphere3 = sdSphere(position - vec3(-1.0,1.0,0.0), 2.0);
+//    let sphere4 = sdSphere(position - vec3(1.0,1.0,0.0), 2.0);
+//    let sphere5 = sdSphere(position - vec3(-1.0,1.0,0.0), 2.0);
+//    let sphere6 = sdSphere(position - vec3(1.0,1.0,0.0), 2.0);
 
 
 
-    var sphereDistance = smin(sphere2, sphere1, sin(f32(globals.frame_count)/100.0+1.0));
-    sphereDistance = smin(capsule, sphereDistance, sin(f32(globals.frame_count)/100.0)+1.0);
-    dist = min(dist, sphereDistance);
+//    var sphereDistance = smin(sphere2, sphere1, sin(f32(globals.frame_count)/100.0+1.0));
+//    sphereDistance = smin(capsule, sphereDistance, sin(f32(globals.frame_count)/100.0)+1.0);
+    dist = min(dist, cloudDistance);
 
 
     return dist;
@@ -157,4 +174,8 @@ fn sdSphere(cameraPoint: vec3<f32>, radius: f32) -> f32 {
 
 fn sdBox(cameraPoint: vec3<f32>, size: vec3<f32>) -> f32 {
     return length(max(abs(cameraPoint) - size, vec3(0.0)));
+}
+
+fn smoothSin(offset:f32) -> f32 {
+    return sin((f32(globals.frame_count) + offset)/100.0);
 }
